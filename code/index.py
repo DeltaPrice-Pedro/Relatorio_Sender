@@ -28,6 +28,11 @@ class Resume:
     def init_data(self):
         with open(self.path, 'r') as file:
             return json.load(file)
+        
+    def show_data(self):
+        a = {}
+        for i in self.base_data.keys():
+            print(i)
     
     def add(self, project: Project) -> str:
         uuid_str = str(uuid.uuid4())
@@ -41,6 +46,16 @@ class Resume:
                 indent=2
             )
         return f'{uuid_str} -> \n{'\n'.join(project.to_string().split(','))}'
+    
+    def remove(self, uuid: str):
+        del self.base_data[uuid]
+        with open(self.path, 'w') as file:
+            json.dump(
+                self.base_data,
+                file,
+                ensure_ascii=False,
+                indent=2
+            )
 
 class Main:
     def __init__(self):
@@ -76,7 +91,10 @@ class Main:
                 elif answer == 2:
                     ...
                 elif answer == 3:
-                    ...
+                    proj_remove = self.resume.remove(self.remove_project())
+                    print('\n--Projeto Removido--')
+                    print(proj_remove)
+                    input()
                 elif answer == 5:
                     self.end = True
                 else:
@@ -94,6 +112,16 @@ class Main:
             return self.error('Tipo errado', self.create_project)
         except Exception as e:
             return self.error(e.__str__(), self.create_project)
+        
+    def remove_project(self):
+        try:
+            print('Qual dos projetos deseja remover?')
+            data = self.resume.show_data()
+            return data[int(input('RESPOSTA: ')) + 1]
+        except TypeError:
+            return self.error('Tipo errado', self.remove_project)
+        except Exception as e:
+            return self.error(e.__str__(), self.remove_project)
         
 if __name__ == '__main__':
     Main()
