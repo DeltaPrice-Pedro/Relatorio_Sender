@@ -23,10 +23,10 @@ class Email:
 
         pass
 
-    def create_message(self, move: list[tuple]) -> str:
-        back_color = True
+    def create_message(self, projects: list[tuple]) -> str:
+        back_color = False
         format_data = []
-        for item in move:
+        for item in projects:
             item_str = ''.join(
                 [f'<td> {data} </td>' for data in item]
             )
@@ -34,7 +34,7 @@ class Email:
             color = 'lightgray' if back_color else 'white'
             back_color = not back_color
             format_data.append(
-                 f'<tr style="background-color: {color};"> {item_str} </tr>'
+                 f'<tr style="background-color: {color}; text-align: center;"> {item_str} </tr>'
             )
 
         with open (self.PATH_MESSAGE, 'r', encoding='utf-8') as file:
@@ -42,12 +42,11 @@ class Email:
             return Template(text_message)\
                 .substitute(infos =  ''.join(x for x in format_data))
 
-
-    def send(self, texto_email: str,) -> None:
+    def send(self, text_email: str,) -> None:
         mime_multipart = MIMEMultipart()
         mime_multipart['From'] = self.smtp_username
         mime_multipart['Subject'] = f'Relatório Pedro {datetime.strftime(datetime.now(), '%d/%m/%Y')}'
-        mime_multipart.attach(MIMEText(texto_email, 'html', 'utf-8'))
+        mime_multipart.attach(MIMEText(text_email, 'html', 'utf-8'))
 
         for to in self.smtp_addresse:
             mime_multipart['To'] = to
@@ -87,14 +86,19 @@ class Resume:
         
     def send_email(self):
         email = Email()
+        projects = self._structured_projects()
+        text_message = email.create_message(projects)
+        email.send(text_message)
+        return projects
+
+    def _structured_projects(self) -> list[tuple]:
         projects = []
         for i in self.base_data.values():
             project = ()
             for j in i.values():
                 project = project + (j,)
             projects.append(project)
-        projects
-        ...
+        return projects
 
         
     def names(self) -> dict:
@@ -184,7 +188,11 @@ class Main:
                     print(self.resume.to_string())
                     input()
                 elif answer == 5:
-                    self.resume.send_email()
+                    projects = self.resume.send_email()
+                    print('\n--Projetos Enviados--')
+                    for index, i in enumerate(projects, 1):
+                        print(f'{index}) {i}')
+                    input()
                 elif answer == 6:
                     self.end = True
                 else:
@@ -220,9 +228,9 @@ class Main:
             uuid = keys[int(input('\nRESPOSTA: ')) - 1]
             return uuid, self.input_spec(uuid)
         except TypeError:
-            return self.error('Tipo errado', self.remove_project)
+            return self.error('Tipo errado', self.update_project)
         except Exception as e:
-            return self.error(e.__str__(), self.remove_project)
+            return self.error(e.__str__(), self.update_project)
 
     def input_spec(self, uuid):
         try:
@@ -232,9 +240,9 @@ class Main:
             new_value = input('Novo valor: ')
             return spec, new_value
         except TypeError:
-                return self.error('Tipo errado', self.remove_project)
+                return self.error('Tipo errado', self.input_spec)
         except Exception as e:
-            return self.error(e.__str__(), self.remove_project)
+            return self.error(e.__str__(), self.input_spec)
 
     def show_names(self):
         count = 1
