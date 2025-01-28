@@ -17,7 +17,7 @@ class Email:
         self.smtp_server = getenv("SMTP_SERVER","")
         self.smtp_port = getenv("SMTP_PORT", 0)
 
-        self.smtp_addresse = json.loads(environ["ADDRESS"])
+        self.smtp_addresse = json.loads(environ["ADDRESSE"])
         self.smtp_username = getenv("EMAIL_SENDER","")
         self.smtp_password = getenv("PASSWRD_SENDER","")
 
@@ -77,13 +77,25 @@ class Project:
     
 class Resume:
     def __init__(self):
-        self.path = Path(__file__).parent / 'src' / 'relatorio.json'
+        self.path = Path(__file__).parent / 'src' / 'doc' / 'relatorio.json'
         self.base_data = self._init_data()
         pass
     
     def _init_data(self) -> dict:
         with open(self.path, 'r') as file:
             return json.load(file)
+        
+    def send_email(self):
+        email = Email()
+        projects = []
+        for i in self.base_data.values():
+            project = ()
+            for j in i.values():
+                project = project + (j,)
+            projects.append(project)
+        projects
+        ...
+
         
     def names(self) -> dict:
         names = {}
@@ -172,7 +184,7 @@ class Main:
                     print(self.resume.to_string())
                     input()
                 elif answer == 5:
-                    self.end = True
+                    self.resume.send_email()
                 elif answer == 6:
                     self.end = True
                 else:
