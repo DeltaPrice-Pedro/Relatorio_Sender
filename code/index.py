@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from string import Template
 from os import getenv, environ
+from traceback import print_exc
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / 'src' / 'env' / '.env')
 
@@ -28,13 +29,13 @@ class Email:
         format_data = []
         for item in projects:
             item_str = ''.join(
-                [f'<td> {data} </td>' for data in item]
+                [f'<td style="text-align: center;"> {data} </td>' for data in item]
             )
 
-            color = 'lightgray' if back_color else 'white'
+            color = 'lightgray' if back_color else 'gainsboro'
             back_color = not back_color
             format_data.append(
-                 f'<tr style="background-color: {color}; text-align: center;"> {item_str} </tr>'
+                 f'<tr style="background-color: {color};"> {item_str} </tr>'
             )
 
         with open (self.PATH_MESSAGE, 'r', encoding='utf-8') as file:
@@ -43,12 +44,11 @@ class Email:
                 .substitute(infos =  ''.join(x for x in format_data))
 
     def send(self, text_email: str,) -> None:
-        mime_multipart = MIMEMultipart()
-        mime_multipart['From'] = self.smtp_username
-        mime_multipart['Subject'] = f'Relatório Pedro {datetime.strftime(datetime.now(), '%d/%m/%Y')}'
-        mime_multipart.attach(MIMEText(text_email, 'html', 'utf-8'))
-
         for to in self.smtp_addresse:
+            mime_multipart = MIMEMultipart()
+            mime_multipart['From'] = self.smtp_username
+            mime_multipart['Subject'] = f'Relatório Pedro {datetime.strftime(datetime.now(), '%d/%m/%Y')}'
+            mime_multipart.attach(MIMEText(text_email, 'html', 'utf-8'))
             mime_multipart['To'] = to
             self._open_server(mime_multipart)
 
@@ -72,7 +72,7 @@ class Project:
         pass
     
     def to_string(self):
-        return json.dumps(self.data)
+        return json.dumps(self.data, indent= 2)
     
 class Resume:
     def __init__(self):
@@ -86,10 +86,9 @@ class Resume:
         
     def send_email(self):
         email = Email()
-        projects = self._structured_projects()
-        text_message = email.create_message(projects)
+        text_message = email.create_message(self._structured_projects())
         email.send(text_message)
-        return projects
+        return json.dumps(self.base_data, indent=2)
 
     def _structured_projects(self) -> list[tuple]:
         projects = []
@@ -108,13 +107,13 @@ class Resume:
         return names
     
     def specs(self, uuid: str):
-        return json.dumps(self.base_data[uuid])
+        return json.dumps(self.base_data[uuid], indent=2)
     
     def add(self, project: Project) -> str:
         uuid_str = str(uuid.uuid4())
         self.base_data[uuid_str] = json.loads(project.to_string())
         self.update_file()
-        return f'{uuid_str} -> \n{'\n'.join(project.to_string().split(','))}'
+        return f'{uuid_str} -> \n{project.to_string()}'
     
     def remove(self, uuid: str):
         removed_name = self.base_data[uuid]['name']
@@ -129,7 +128,7 @@ class Resume:
         return old_value, new_value
     
     def test_spec(self, uuid: str, spec: str,):
-        self.updater[uuid][spec]
+        self.base_data[uuid][spec]
 
     def update_file(self):
         with open(self.path, 'w') as file:
@@ -175,7 +174,8 @@ class Main:
                     print(proj_add)
                     input()
                 elif answer == 2:
-                    old_value, new_value = self.resume.update(self.update_project())
+                    uuid, spec, new_value = self.update_project()
+                    old_value, new_value = self.resume.update(uuid, spec, new_value)
                     print('\n--Projeto Atualizado--')
                     print(f'{old_value} -> {new_value}')
                     input()
@@ -190,8 +190,7 @@ class Main:
                 elif answer == 5:
                     projects = self.resume.send_email()
                     print('\n--Projetos Enviados--')
-                    for index, i in enumerate(projects, 1):
-                        print(f'{index}) {i}')
+                    print(projects)
                     input()
                 elif answer == 6:
                     self.end = True
@@ -226,7 +225,8 @@ class Main:
             print('Qual dos projetos deseja atualizar?')
             keys = self.show_names()
             uuid = keys[int(input('\nRESPOSTA: ')) - 1]
-            return uuid, self.input_spec(uuid)
+            spec, new_value = self.input_spec(uuid)
+            return uuid, spec, new_value
         except TypeError:
             return self.error('Tipo errado', self.update_project)
         except Exception as e:
@@ -234,14 +234,16 @@ class Main:
 
     def input_spec(self, uuid):
         try:
-            print('\n' + self.resume.specs(uuid))
-            spec = input('Propriedade desejada: ')
-            self.resume.test_spec(spec)
-            new_value = input('Novo valor: ')
+            print('\nPropriedade desejada: ')
+            print(self.resume.specs(uuid) + '\n')
+            spec = input('RESPOSTA: ')
+            self.resume.test_spec(uuid, spec)
+            new_value = input('\nNovo valor: ')
             return spec, new_value
         except TypeError:
                 return self.error('Tipo errado', self.input_spec)
         except Exception as e:
+            print_exc()
             return self.error(e.__str__(), self.input_spec)
 
     def show_names(self):
