@@ -32,7 +32,7 @@ class Email:
                 [f'<td style="text-align: center;"> {data} </td>' for data in item]
             )
 
-            color = 'lightgray' if back_color else 'gainsboro'
+            color = 'lightblue' if back_color else 'lightyellow'
             back_color = not back_color
             format_data.append(
                  f'<tr style="background-color: {color};"> {item_str} </tr>'
@@ -56,7 +56,7 @@ class Email:
         with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
             server.starttls()
             server.login(self.smtp_username, self.smtp_password)
-            server.send_message(mime_multipart)
+            # server.send_message(mime_multipart)
 
 class Project:
     def __init__(self, nome: str, finish: int, thinker: str):
@@ -64,12 +64,19 @@ class Project:
         self.data = {
             "name": nome,
             "start": today.strftime('%d/%m/%Y'),
-            "finish": (today + timedelta(days=finish)).strftime('%d/%m/%Y'),
+            "finish": self.calc_finish(finish, today).strftime('%d/%m/%Y'),
             "thinker": thinker,
             "state": 'Inativo',
             "grip": 'Inutilizado'
         }
         pass
+
+    def calc_finish(self, finish: int, today: datetime):
+        final = today + timedelta(days=finish)
+        weekday = final.weekday() - 4
+        if  weekday > 0:
+            return self.calc_finish(finish + 1, today)
+        return final
     
     def to_string(self):
         return json.dumps(self.data, indent= 2)
@@ -148,12 +155,6 @@ class Main:
         self.menu()
         pass
     
-    def error(self, message: str, method):
-        print(f'{"!"*3}{message}{"!"*3}')
-        print('(Pressione qualquer tecla para continuar)')
-        input()
-        return method()
-    
     def options(self) -> int:
         try:
             print(f'{"#"*40}\n{"#"*7} Gerenciador de Relatório {"#"*7}\n{"#"*40}')
@@ -209,6 +210,8 @@ class Main:
             return Project(name, finish, thinker)
         except TypeError:
             return self.error('Tipo errado', self.create_project)
+        except KeyboardInterrupt:
+            return 
         except Exception as e:
             return self.error(e.__str__(), self.create_project)
         
@@ -219,6 +222,8 @@ class Main:
             return keys[int(input('\nRESPOSTA: ')) - 1]
         except TypeError:
             return self.error('Tipo errado', self.remove_project)
+        except KeyboardInterrupt:
+            return 
         except Exception as e:
             return self.error(e.__str__(), self.remove_project)
         
@@ -231,6 +236,8 @@ class Main:
             return uuid, spec, new_value
         except TypeError:
             return self.error('Tipo errado', self.update_project)
+        except KeyboardInterrupt:
+            return 
         except Exception as e:
             return self.error(e.__str__(), self.update_project)
 
@@ -244,6 +251,8 @@ class Main:
             return spec, new_value
         except TypeError:
                 return self.error('Tipo errado', self.input_spec)
+        except KeyboardInterrupt:
+            return 
         except Exception as e:
             print_exc()
             return self.error(e.__str__(), self.input_spec)
@@ -257,7 +266,12 @@ class Main:
             count = count + 1
         return keys
     
-    
+        
+    def error(self, message: str, method):
+        print(f'{"!"*3}{message}{"!"*3}')
+        print('(Pressione qualquer tecla para continuar)')
+        input()
+        return method()
         
 if __name__ == '__main__':
     Main()
