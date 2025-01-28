@@ -56,7 +56,7 @@ class Email:
         with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
             server.starttls()
             server.login(self.smtp_username, self.smtp_password)
-            # server.send_message(mime_multipart)
+            server.send_message(mime_multipart)
 
 class Project:
     def __init__(self, nome: str, finish: int, thinker: str):
