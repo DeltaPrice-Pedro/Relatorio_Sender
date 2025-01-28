@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+          border: 2px groove ;
+        }
+        
+        td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px 10px;
+        }
+
+        th {
+            border: 2px groove ;
+            text-align: center;
+            background-color: rgb(225, 225, 225);
+            padding: 8px 10px;
+        }
+        
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Ano</th>
+                <th>Taxa</th>
+                <th>Variação</th>
+                <th>Investimento Mínimo</th>
+                <th>Preço Unitário</th>
+                <th>Vencimento</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${infos}
+        </tbody>
+    </table>
+</body>
+</html>
