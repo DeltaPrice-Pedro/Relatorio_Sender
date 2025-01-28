@@ -88,7 +88,6 @@ class Resume:
         email = Email()
         text_message = email.create_message(self._structured_projects())
         email.send(text_message)
-        return json.dumps(self.base_data, indent=2)
 
     def _structured_projects(self) -> list[tuple]:
         projects = []
@@ -188,9 +187,12 @@ class Main:
                     print(self.resume.to_string())
                     input()
                 elif answer == 5:
-                    projects = self.resume.send_email()
-                    print('\n--Projetos Enviados--')
-                    print(projects)
+                    self.resume.to_string()
+                    resp = input('Confirma o envio? ')
+                    if resp == 'n':
+                        continue
+                    self.resume.send_email()
+                    print('\n!!Projetos Enviados!!')
                     input()
                 elif answer == 6:
                     self.end = True
