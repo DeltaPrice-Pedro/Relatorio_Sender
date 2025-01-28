@@ -6,8 +6,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from string import Template
-from os import getenv
-from re import sub
+from os import getenv, environ
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / 'src' / 'env' / '.env')
 
@@ -18,31 +17,22 @@ class Email:
         self.smtp_server = getenv("SMTP_SERVER","")
         self.smtp_port = getenv("SMTP_PORT", 0)
 
+        self.smtp_addresse = json.loads(environ["ADDRESS"])
         self.smtp_username = getenv("EMAIL_SENDER","")
         self.smtp_password = getenv("PASSWRD_SENDER","")
 
-        self.sign_up = '▲'
-        self.sign_down = '▼'
-
-        self.ref_cor = {
-            'IPCA': 'lightyellow',
-            'RENDA': 'lightblue',
-            'EDUCA': 'lightpink',
-            'PREFIXADO': 'lightcyan',
-            'SELIC': 'lightcoral'
-        }
         pass
 
     def create_message(self, move: list[tuple]) -> str:
+        back_color = True
         format_data = []
         for item in move:
-            item = self.update_values(item)
-
             item_str = ''.join(
-                [f'<td> {data} </td>' for data in item[1:]]
+                [f'<td> {data} </td>' for data in item]
             )
 
-            color = self.get_color(item[1])
+            color = 'lightgray' if back_color else 'white'
+            back_color = not back_color
             format_data.append(
                  f'<tr style="background-color: {color};"> {item_str} </tr>'
             )
@@ -52,32 +42,16 @@ class Email:
             return Template(text_message)\
                 .substitute(infos =  ''.join(x for x in format_data))
 
-    def update_values(self, item):
-        y = list(item)
 
-        color_font = 'green' if float(y[4].replace('.','').replace(',','.')) > 0 else 'red'
-        signal = f'% {self.sign_up if float(y[4]) > 0 else self.sign_down}'
-
-        y[4] = f'<span style="color:{color_font}";> {y[4].replace('.',',')} {signal} </span>'
-        
-        y[1] = sub(r"\d", "", item[1])
-        return tuple(y)
-        
-    def get_color(self, name_row):
-        for key, color in self.ref_cor.items():
-            if key in name_row:
-                return color
-        return 'white'
-
-    def send(self, texto_email: str, to: str) -> None:
+    def send(self, texto_email: str,) -> None:
         mime_multipart = MIMEMultipart()
         mime_multipart['From'] = self.smtp_username
-        mime_multipart['To'] = to
-        mime_multipart['Subject'] = f'Atualização Tesouro Direto {datetime.strftime(datetime.now(), '%d/%m - %H:%M')}'
-
+        mime_multipart['Subject'] = f'Relatório Pedro {datetime.strftime(datetime.now(), '%d/%m/%Y')}'
         mime_multipart.attach(MIMEText(texto_email, 'html', 'utf-8'))
 
-        self._open_server(mime_multipart)
+        for to in self.smtp_addresse:
+            mime_multipart['To'] = to
+            self._open_server(mime_multipart)
 
     def _open_server(self, mime_multipart: MIMEMultipart) -> None:
         with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
