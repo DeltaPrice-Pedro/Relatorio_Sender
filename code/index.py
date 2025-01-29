@@ -67,7 +67,7 @@ class Project:
             "finish": self.calc_finish(finish, today).strftime('%d/%m/%Y'),
             "thinker": thinker,
             "state": 'Inativo',
-            "grip": 'Inutilizado'
+            "grip": 'Em desenvolvimento'
         }
         pass
 
