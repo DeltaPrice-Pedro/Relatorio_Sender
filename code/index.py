@@ -68,7 +68,8 @@ class Project:
             "development_days": 0,
             "master": thinker,
             "state": 'Em desenvolvimento',
-            "grip": '--'
+            "grip": '--',
+            "comments": ''
         }
         pass
 
@@ -281,6 +282,9 @@ class Main:
                     print('Hoje a nova aderência do projeto?')
                     resp = int(input('\nRESPOSTA: '))
                     self.update_spec(uuid, answer, f'{resp}%' )
+                if answer == 'comments':
+                    print('Quais comentários sobre o projeto?')
+                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
                 if answer == None:
                     end_spec = True
             
