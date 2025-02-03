@@ -154,6 +154,7 @@ class Resume:
 
 class Main:
     def __init__(self):
+        self.states = ['Ativo', 'Inativo', 'Em desenvolvimento']
         self.resume = Resume()
         self.end = False
         self.menu()
@@ -201,7 +202,7 @@ class Main:
 
     def send_email(self):
         try:
-            print('Qual dos projetos deseja atualizar?')
+            print('Qual dos projetos está em foco hoje?')
             keys = self.show_names()
             uuid = keys[int(input('\nRESPOSTA: ')) - 1]
             self.resume.send_email(uuid)
@@ -275,7 +276,7 @@ class Main:
                     self.update_spec(uuid, answer, input('\nRESPOSTA: '))
                 if answer == 'state':
                     print('Qual é o estado do projeto?')
-                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
+                    self.update_spec(uuid, answer, self.input_state())
                 if answer == 'grip':
                     print('Hoje a nova aderência do projeto?')
                     resp = int(input('\nRESPOSTA: '))
@@ -312,6 +313,20 @@ class Main:
         print('\n--Projeto Atualizado--')
         print(f'{old_value} -> {new_value}')
         input()
+
+    def input_state(self):
+        try:
+            for index, i in enumerate(self.states):
+                print(f'{index + 1}) {i}')
+            answer = int(input('\nRESPOSTA: '))
+            return self.states[answer - 1]
+        except TypeError:
+                return self.error('Tipo errado', self.input_state)
+        except KeyboardInterrupt:
+            return '--'
+        except Exception as e:
+            print_exc()
+            return self.error(e.__str__(), self.input_state)
 
     def show_names(self):
         count = 1
