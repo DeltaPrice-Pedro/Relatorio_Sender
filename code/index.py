@@ -65,7 +65,7 @@ class Project:
             "name": nome,
             "start": today.strftime('%d/%m/%Y'),
             "finish": self.calc_finish(finish, today).strftime('%d/%m/%Y'),
-            "thinker": thinker,
+            "master": thinker,
             "state": 'Inativo',
             "grip": 'Em desenvolvimento'
         }
