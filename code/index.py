@@ -205,7 +205,7 @@ class Main:
     def create_project(self):
         try:
             name = input('Nome: ')
-            thinker = input('Idealizador: ')
+            thinker = input('Supervisor: ')
             finish = int(input('Previsão de término: '))
             return Project(name, finish, thinker)
         except TypeError:
