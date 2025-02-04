@@ -150,6 +150,9 @@ class Resume:
                 indent=2
             )
 
+    def to_string(self, uuid: str):
+        return json.dumps(self.base_data[uuid], indent=2)
+
     def to_string(self):
         return json.dumps(self.base_data, indent=2)
 
@@ -217,7 +220,7 @@ class Main:
     def create_project(self):
         try:
             name = input('Nome: ')
-            thinker = input('Idealizador: ')
+            thinker = input('Supervisor: ')
             finish = int(input('Previsão de término: '))
             return Project(name, finish, thinker)
         except TypeError:
@@ -257,7 +260,7 @@ class Main:
             end_spec = False
             while end_spec == False:
                 print(f'{"#"*5} ATUALIZAR PROJETO {"#"*5}')
-                print(f'Estado atual:\n {self.resume.to_string()}')
+                print(f'Estado atual:\n {self.resume.to_string(uuid)}')
                 answer = self.input_spec(uuid)
                 if answer == 'name':
                     print('Qual novo nome do projeto?')

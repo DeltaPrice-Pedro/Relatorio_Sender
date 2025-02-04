@@ -1,1 +1,112 @@
-{}
+{
+    "a96a608c-310a-48a8-9aba-1d7a081ff84d": {
+      "name": "Avaliador de Rotas",
+      "start": "04/02/2025",
+      "finish": "14/02/2025",
+      "development_days": 0,
+      "master": "Wellington",
+      "state": "Em desenvolvimento",
+      "grip": "--",
+      "comments": ""
+    },
+    "61934b7a-093c-43d1-bb91-ed6073821e95": {
+      "name": "Extens�o Certificado",
+      "start": "04/02/2025",
+      "finish": "10/02/2025",
+      "development_days": 0,
+      "master": "Roberto",
+      "state": "Em desenvolvimento",
+      "grip": "--",
+      "comments": ""
+    },
+    "f7ccb4bd-7dbf-4558-acba-a569ab58fc59": {
+      "name": "Acompanha Processos",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Roberto",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "c742602e-f3dd-443e-9221-b8e17d8128f5": {
+      "name": "Gerador de Assinatura",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Bruno",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "58144ac1-1999-44ca-875e-cd5520ba09bb": {
+      "name": "Conferencia Autom�tica",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Bruno",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "a33d6426-fc2a-46d4-a1e3-1b156c3694a6": {
+      "name": "Consultor Acessorias",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Wellington",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "2c89e217-423b-48a5-8741-d5a9f94cdc4a": {
+      "name": "Gerador de CPS",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Roberto",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "e8b2bd98-a33c-4b14-bb65-832f55724216": {
+      "name": "Email Cobran�a",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Bruno",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "2dd94340-ae17-4815-8ed7-28d87ce6c446": {
+      "name": "Estoque Delta",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Wellington",
+      "state": "Ativo",
+      "grip": "80%",
+      "comments": "Em processo de disponibiliza-lo na apple store (aos usu�rios de IOS)"
+    },
+    "116a9b43-533f-4511-8a9c-fc659036c4d1": {
+      "name": "Leitor de Extrato",
+      "start": "04/02/2025",
+      "finish": "04/02/2025",
+      "development_days": 0,
+      "master": "Wellington",
+      "state": "Ativo",
+      "grip": "100%",
+      "comments": ""
+    },
+    "ba5634f3-c0da-4157-95a8-8ec5cd65e435": {
+      "name": "Felicita��o Cliente",
+      "start": "04/02/2025",
+      "finish": "14/02/2025",
+      "development_days": 0,
+      "master": "Wellington",
+      "state": "Em desenvolvimento",
+      "grip": "--",
+      "comments": ""
+    }
+  }
