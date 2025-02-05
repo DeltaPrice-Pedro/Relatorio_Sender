@@ -97,6 +97,7 @@ class Resume:
         email = Email()
         self.base_data[uuid]['development_days'] =\
             self.base_data[uuid]['development_days'] + 1
+        self.update_file()
         
         text_message = email.create_message(self._structured_projects())
         email.send(text_message)
