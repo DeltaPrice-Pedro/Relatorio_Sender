@@ -65,9 +65,11 @@ class Project:
             "name": nome,
             "start": today.strftime('%d/%m/%Y'),
             "finish": self.calc_finish(finish, today).strftime('%d/%m/%Y'),
+            "development_days": 0,
             "master": thinker,
-            "state": 'Inativo',
-            "grip": 'Em desenvolvimento'
+            "state": 'Em desenvolvimento',
+            "grip": '--',
+            "comments": ''
         }
         pass
 
@@ -91,8 +93,12 @@ class Resume:
         with open(self.path, 'r') as file:
             return json.load(file)
         
-    def send_email(self):
+    def send_email(self, uuid: str):
         email = Email()
+        self.base_data[uuid]['development_days'] =\
+            self.base_data[uuid]['development_days'] + 1
+        self.update_file()
+        
         text_message = email.create_message(self._structured_projects())
         email.send(text_message)
 
@@ -112,8 +118,8 @@ class Resume:
             names[key] = value['name']
         return names
     
-    def specs(self, uuid: str):
-        return json.dumps(self.base_data[uuid], indent=2)
+    def specs(self, uuid: str) -> list[str]:
+        return list(self.base_data[uuid].keys())
     
     def add(self, project: Project) -> str:
         uuid_str = str(uuid.uuid4())
@@ -145,11 +151,15 @@ class Resume:
                 indent=2
             )
 
+    def to_string_uuid(self, uuid: str):
+        return json.dumps(self.base_data[uuid], indent=2)
+
     def to_string(self):
         return json.dumps(self.base_data, indent=2)
 
 class Main:
     def __init__(self):
+        self.states = ['Ativo', 'Inativo', 'Em desenvolvimento']
         self.resume = Resume()
         self.end = False
         self.menu()
@@ -174,11 +184,7 @@ class Main:
                     print(proj_add)
                     input()
                 elif answer == 2:
-                    uuid, spec, new_value = self.update_project()
-                    old_value, new_value = self.resume.update(uuid, spec, new_value)
-                    print('\n--Projeto Atualizado--')
-                    print(f'{old_value} -> {new_value}')
-                    input()
+                    self.update_project()
                 elif answer == 3:
                     proj_remove = self.resume.remove(self.remove_project())
                     print('\n--Projeto Removido--')
@@ -188,19 +194,29 @@ class Main:
                     print(self.resume.to_string())
                     input()
                 elif answer == 5:
-                    self.resume.to_string()
-                    resp = input('Confirma o envio? ')
-                    if resp == 'n':
-                        continue
-                    self.resume.send_email()
-                    print('\n!!Projetos Enviados!!')
-                    input()
+                    resp = self.send_email()
+                    if resp != None:
+                        print('\n!!Projetos Enviados!!')
+                        input()
                 elif answer == 6:
                     self.end = True
                 else:
                     raise Exception('Fora das opções disponíveis')
         except Exception as e:
             self.error(e.__str__(), self.menu)
+
+    def send_email(self):
+        try:
+            print('Qual dos projetos está em foco hoje?')
+            keys = self.show_names()
+            uuid = keys[int(input('\nRESPOSTA: ')) - 1]
+            self.resume.send_email(uuid)
+        except TypeError:
+            return self.error('Tipo errado', self.send_email)
+        except KeyboardInterrupt:
+            return 
+        except Exception as e:
+            return self.error(e.__str__(), self.send_email)
             
     def create_project(self):
         try:
@@ -232,30 +248,93 @@ class Main:
             print('Qual dos projetos deseja atualizar?')
             keys = self.show_names()
             uuid = keys[int(input('\nRESPOSTA: ')) - 1]
-            spec, new_value = self.input_spec(uuid)
-            return uuid, spec, new_value
+            self.menu_spec(uuid)
         except TypeError:
             return self.error('Tipo errado', self.update_project)
         except KeyboardInterrupt:
             return 
         except Exception as e:
             return self.error(e.__str__(), self.update_project)
-
-    def input_spec(self, uuid):
+        
+    def menu_spec(self, uuid):
         try:
-            print('\nPropriedade desejada: ')
-            print(self.resume.specs(uuid) + '\n')
-            spec = input('RESPOSTA: ')
-            self.resume.test_spec(uuid, spec)
-            new_value = input('\nNovo valor: ')
-            return spec, new_value
-        except TypeError:
-                return self.error('Tipo errado', self.input_spec)
+            end_spec = False
+            while end_spec == False:
+                print(f'{"#"*5} ATUALIZAR PROJETO {"#"*5}')
+                print(f'Estado atual:\n {self.resume.to_string_uuid(uuid)}')
+                answer = self.input_spec(uuid)
+                if answer == 'name':
+                    print('Qual novo nome do projeto?')
+                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
+                if answer == 'start':
+                    print('Hoje é o novo inicio do projeto?')
+                    if input('\nRESPOSTA: ') != 'n':
+                        self.update_spec(uuid, answer, datetime.now().strftime('%d/%m/%Y'))
+                if answer == 'finish':
+                    print('Quando será o término do projeto?')
+                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
+                if answer == 'development_days':
+                    print('Quantos dias de desenvolvimento projeto?')
+                    self.update_spec(uuid, answer, int(input('\nRESPOSTA: ')))
+                if answer == 'master':
+                    print('Qual o novo supervisor do projeto?')
+                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
+                if answer == 'state':
+                    print('Qual é o estado do projeto?')
+                    self.update_spec(uuid, answer, self.input_state())
+                if answer == 'grip':
+                    print('Hoje a nova aderência do projeto?')
+                    resp = int(input('\nRESPOSTA: '))
+                    self.update_spec(uuid, answer, f'{resp}%' )
+                if answer == 'comments':
+                    print('Quais comentários sobre o projeto?')
+                    self.update_spec(uuid, answer, input('\nRESPOSTA: '))
+                if answer == None:
+                    end_spec = True
+            
         except KeyboardInterrupt:
             return 
         except Exception as e:
+            self.error(e.__str__(), self.menu_spec)
+
+    def input_spec(self, uuid: str):
+        try:
+            print('\nPropriedade desejada: ')
+            itens = self.resume.specs(uuid)
+            for index, i in enumerate(itens):
+                print(f'{index + 1}) {i}')
+            print(f'{index + 2}) sair')
+            answer = int(input('\nRESPOSTA: '))
+            if answer == index + 2:
+                return None
+            return itens[answer - 1]
+        except TypeError:
+                return self.error('Tipo errado', self.input_spec)
+        except KeyboardInterrupt:
+            return None
+        except Exception as e:
             print_exc()
             return self.error(e.__str__(), self.input_spec)
+        
+    def update_spec(self, uuid, spec, new_value):
+        old_value, new_value = self.resume.update(uuid, spec, new_value)
+        print('\n--Projeto Atualizado--')
+        print(f'{old_value} -> {new_value}')
+        input()
+
+    def input_state(self):
+        try:
+            for index, i in enumerate(self.states):
+                print(f'{index + 1}) {i}')
+            answer = int(input('\nRESPOSTA: '))
+            return self.states[answer - 1]
+        except TypeError:
+                return self.error('Tipo errado', self.input_state)
+        except KeyboardInterrupt:
+            return '--'
+        except Exception as e:
+            print_exc()
+            return self.error(e.__str__(), self.input_state)
 
     def show_names(self):
         count = 1
@@ -265,7 +344,6 @@ class Main:
             keys.append(key)
             count = count + 1
         return keys
-    
         
     def error(self, message: str, method):
         print(f'{"!"*3}{message}{"!"*3}')
