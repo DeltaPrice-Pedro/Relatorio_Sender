@@ -151,7 +151,7 @@ class Resume:
                 indent=2
             )
 
-    def to_string(self, uuid: str):
+    def to_string_uuid(self, uuid: str):
         return json.dumps(self.base_data[uuid], indent=2)
 
     def to_string(self):
@@ -261,7 +261,7 @@ class Main:
             end_spec = False
             while end_spec == False:
                 print(f'{"#"*5} ATUALIZAR PROJETO {"#"*5}')
-                print(f'Estado atual:\n {self.resume.to_string(uuid)}')
+                print(f'Estado atual:\n {self.resume.to_string_uuid(uuid)}')
                 answer = self.input_spec(uuid)
                 if answer == 'name':
                     print('Qual novo nome do projeto?')
