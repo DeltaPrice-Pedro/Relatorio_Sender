@@ -10,7 +10,7 @@
     "comments": ""
   },
   "61934b7a-093c-43d1-bb91-ed6073821e95": {
-    "name": "Extensão Certificado",
+    "name": "Extensï¿½o Certificado",
     "start": "04/02/2025",
     "finish": "10/02/2025",
     "development_days": 0,
@@ -27,7 +27,7 @@
     "master": "Roberto",
     "state": "Ativo",
     "grip": "100%",
-    "comments": "Sob estado de reestruturação pendente"
+    "comments": "Sob estado de reestruturaï¿½ï¿½o pendente"
   },
   "c742602e-f3dd-443e-9221-b8e17d8128f5": {
     "name": "Gerador de Assinatura",
@@ -40,7 +40,7 @@
     "comments": ""
   },
   "58144ac1-1999-44ca-875e-cd5520ba09bb": {
-    "name": "Conferência Automática",
+    "name": "Conferï¿½ncia Automï¿½tica",
     "start": "04/02/2025",
     "finish": "04/02/2025",
     "development_days": 0,
@@ -70,7 +70,7 @@
     "comments": ""
   },
   "e8b2bd98-a33c-4b14-bb65-832f55724216": {
-    "name": "Email Cobrança",
+    "name": "Email Cobranï¿½a",
     "start": "04/02/2025",
     "finish": "04/02/2025",
     "development_days": 0,
@@ -99,22 +99,12 @@
     "grip": "100%",
     "comments": ""
   },
-  "ba5634f3-c0da-4157-95a8-8ec5cd65e435": {
-    "name": "Felicitação Cliente",
-    "start": "04/02/2025",
-    "finish": "14/02/2025",
-    "development_days": 0,
-    "master": "Wellington",
-    "state": "Em desenvolvimento",
-    "grip": "--",
-    "comments": ""
-  },
   "1a78a9ae-6d28-4635-9f70-f10b9372530c": {
     "name": "Controle Estoque",
     "start": "07/02/2025",
     "finish": "07/02/2025",
     "development_days": 3,
-    "master": "Welington",
+    "master": "Wellington",
     "state": "Em desenvolvimento",
     "grip": "--",
     "comments": ""
