@@ -11,9 +11,49 @@ from traceback import print_exc
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / 'src' / 'env' / '.env')
 
-class Email:
+class Message:
     PATH_MESSAGE = Path(__file__).parent / 'src' / 'doc' / 'base_message.html'
+    backgound_color = 'style="background-color: {0};"'
+    row_tag = '<td {0}> {1} </td>'
+    collumn_tag = '<tr> {0} </tr>'
+    colors = ['lightgreen','lightyellow','lightcyan','lightcoral']
+    index_master = 4
 
+    def __init__(self, projects: list[tuple]) -> str:
+        projects.sort(key= lambda x: x[4])
+        self.projects = projects
+        pass
+
+    def create(self) -> str:
+        format_data = self._format()
+        with open (self.PATH_MESSAGE, 'r', encoding='utf-8') as file:
+            text_message = file.read()
+            return Template(text_message)\
+                .substitute(infos =  ''.join(x for x in format_data))
+
+    def _format(self):
+        current_color = -1
+        seen_master = []
+        format_data = []
+        for item in self.projects:
+            item_str = ''
+
+            if item[self.index_master] not in seen_master:
+                seen_master.append(item[self.index_master])
+                current_color = current_color + 1
+
+            for index, data in enumerate(item):
+                color = self.backgound_color.format(self.colors[current_color])\
+                    if index == self.index_master else ''
+                item_str = item_str + self.row_tag.format(color, data) 
+
+            format_data.append(
+                 self.collumn_tag.format(item_str)
+            )
+            
+        return format_data
+
+class Email:
     def __init__(self) -> None:
         self.smtp_server = getenv("SMTP_SERVER","")
         self.smtp_port = getenv("SMTP_PORT", 0)
@@ -21,27 +61,7 @@ class Email:
         self.smtp_addresse = json.loads(environ["ADDRESSE"])
         self.smtp_username = getenv("EMAIL_SENDER","")
         self.smtp_password = getenv("PASSWRD_SENDER","")
-
         pass
-
-    def create_message(self, projects: list[tuple]) -> str:
-        back_color = False
-        format_data = []
-        for item in projects:
-            item_str = ''.join(
-                [f'<td style="text-align: center;"> {data} </td>' for data in item]
-            )
-
-            color = 'lightblue' if back_color else 'lightyellow'
-            back_color = not back_color
-            format_data.append(
-                 f'<tr style="background-color: {color};"> {item_str} </tr>'
-            )
-
-        with open (self.PATH_MESSAGE, 'r', encoding='utf-8') as file:
-            text_message = file.read()
-            return Template(text_message)\
-                .substitute(infos =  ''.join(x for x in format_data))
 
     def send(self, text_email: str,) -> None:
         for to in self.smtp_addresse:
@@ -95,12 +115,12 @@ class Resume:
         
     def send_email(self, uuid: str):
         email = Email()
+        
         self.base_data[uuid]['development_days'] =\
             self.base_data[uuid]['development_days'] + 1
         self.update_file()
         
-        text_message = email.create_message(self._structured_projects())
-        email.send(text_message)
+        email.send(Message(self._structured_projects()).create())
 
     def _structured_projects(self) -> list[tuple]:
         projects = []
@@ -110,7 +130,6 @@ class Resume:
                 project = project + (j,)
             projects.append(project)
         return projects
-
         
     def names(self) -> dict:
         names = {}

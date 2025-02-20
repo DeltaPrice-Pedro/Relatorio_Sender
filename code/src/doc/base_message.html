@@ -11,7 +11,7 @@
         
         td {
             border: 1px solid #ddd;
-            text-align: left;
+            text-align: center;
             padding: 8px 10px;
         }
 
@@ -21,11 +21,16 @@
             background-color: rgb(225, 225, 225);
             padding: 8px 10px;
         }
+
+        #tb_proj tr.header,
+        #tb_proj tr:hover{
+            background-color: lightgray;
+        }
         
     </style>
 </head>
 <body>
-    <table>
+    <table id="tb_proj">
         <thead>
             <tr>
                 <th>Nome</th>
